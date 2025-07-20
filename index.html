@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>6Rwin - বোনাস ও এভিয়েটর পূর্বাভাস</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+      background: #000; /* Black background */
+      color: #ffffff; /* Pure white for better readability */
+      text-align: center;
+      line-height: 1.6;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                        radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      background-size: 30px 30px, 40px 40px;
+      background-position: 0 0, 15px 15px;
+      animation: backgroundPan 60s linear infinite;
+      z-index: -1;
+    }
+
+    @keyframes backgroundPan {
+      from { background-position: 0 0, 15px 15px; }
+      to { background-position: 600px 600px, 615px 615px; }
+    }
+
+    .container {
+      max-width: 650px;
+      margin: 0 auto;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    .emoji-header {
+      font-size: 3.5rem;
+      margin: 15px 0;
+      animation: pulse 2s infinite alternate;
+      color: #ffd700; /* Gold color for header emojis */
+    }
+
+    @keyframes pulse {
+      from { transform: scale(1); }
+      to { transform: scale(1.1); }
+    }
+
+    .card {
+      background: rgba(30, 30, 30, 0.8); /* Darker semi-transparent background for better contrast */
+      border-radius: 25px;
+      padding: 35px;
+      margin: 30px 0;
+      box-shadow: 0 20px 45px rgba(0, 255, 255, 0.2); /* Cyan-blue shadow for cards */
+      color: #ffffff; /* Pure white text */
+      position: relative;
+      overflow: hidden;
+      /* Removed: border: 2px solid #00ffff; */
+    }
+    .card::after {
+      content: '💰'; /* Different emojis */
+      position: absolute;
+      font-size: 4rem;
+      opacity: 0.08;
+      right: 30px;
+      bottom: 20px;
+      z-index: 0;
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      background: linear-gradient(to right, #00ffff, #39ff14); /* Cyan to neon green gradient for headings */
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      position: relative;
+      z-index: 1;
+      text-shadow: 1px 1px 2px rgba(0,255,255,0.3); /* Cyan text shadow */
+    }
+    /* Gift Box Styling */
+    .gift-box {
+      background: rgba(40, 40, 40, 0.8); /* Darker semi-transparent background */
+      border: 5px solid #ffcc00; /* Gold border for gift box */
+      border-radius: 20px;
+      padding: 40px 20px; /* Increased top/bottom padding for height, reduced side padding for width */
+      margin: 40px auto;
+      box-shadow: 0 15px 30px rgba(255, 215, 0, 0.3), 0 0 40px rgba(255, 215, 0, 0.7); /* Stronger shadow and glow */
+      position: relative;
+      overflow: hidden;
+      max-width: 80%; /* Slightly smaller width */
+    }
+
+    .gift-box::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      border: 10px dashed #ffd700; /* Dashed ribbon effect */
+      border-radius: 25px;
+      z-index: 0;
+      animation: ribbonGlow 2s infinite alternate;
+    }
+
+    @keyframes ribbonGlow {
+      from { box-shadow: 0 0 5px rgba(255, 215, 0, 0.3); }
+      to { box-shadow: 0 0 20px rgba(255, 215, 0, 1); }
+    }
+
+    .gift-box::after {
+      content: '🎁'; /* Gift emoji */
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 10rem;
+      opacity: 0.15;
+      z-index: 1;
+    }
+
+    .gift-box .bonus-text {
+      font-size: 32px; /* Slightly smaller font size for better fit */
+      font-weight: bold;
+      color: #FFFFFF; /* Changed to white */
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7); /* Stronger shadow for better contrast */
+      position: relative;
+      z-index: 2;
+    }
+    .gift-box .bonus-text a {
+      color: #FFFFFF; /* Ensure link text is white */
+      text-decoration: none; /* Remove underline from link */
+    }
+
+    .gift-box .money-emojis {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .gift-box .money-emojis span {
+      position: absolute;
+      font-size: 2.5rem;
+      animation: floatMoney 10s infinite ease-in-out;
+      opacity: 0;
+      white-space: nowrap;
+      color: #ffd700; /* Gold color for money emojis */
+    }
+
+    .gift-box .money-emojis span:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+    .gift-box .money-emojis span:nth-child(2) { top: 50%; left: 20%; animation-delay: 2s; }
+    .gift-box .money-emojis span:nth-child(3) { top: 80%; left: 30%; animation-delay: 4s; }
+    .gift-box .money-emojis span:nth-child(4) { top: 20%; left: 40%; animation-delay: 6s; }
+    .gift-box .money-emojis span:nth-child(5) { top: 70%; left: 50%; animation-delay: 8s; }
+    .gift-box .money-emojis span:nth-child(6) { top: 30%; left: 60%; animation-delay: 1s; }
+    .gift-box .money-emojis span:nth-child(7) { top: 60%; left: 70%; animation-delay: 3s; }
+    .gift-box .money-emojis span:nth-child(8) { top: 5%; left: 80%; animation-delay: 5s; }
+    .gift-box .money-emojis span:nth-child(9) { top: 40%; left: 90%; animation-delay: 7s; }
+    .gift-box .money-emojis span:nth-child(10) { top: 90%; left: 15%; animation-delay: 9s; }
+
+
+    @keyframes floatMoney {
+      0% { transform: translateY(0) scale(0.8); opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { transform: translateY(-100px) scale(1.2); opacity: 0; }
+    }
+
+    .btn {
+      background: linear-gradient(to right, #00ffff, #39ff14); /* Cyan to neon green button gradient */
+      color: #000; /* Black text on buttons for contrast */
+      border: none;
+      padding: 18px 40px;
+      font-size: 20px;
+      border-radius: 50px;
+      cursor: pointer;
+      margin: 25px 0;
+      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 0 10px 25px rgba(0, 255, 255, 0.4); /* Cyan shadow for buttons */
+      position: relative;
+      z-index: 1;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .btn:hover {
+      transform: translateY(-7px);
+      box-shadow: 0 15px 30px rgba(0, 255, 255, 0.6); /* More prominent shadow on hover */
+      background: linear-gradient(to right, #39ff14, #00ffff); /* Invert gradient on hover */
+    }
+    .feature-list {
+      text-align: left;
+      margin: 30px 0;
+      padding-left: 30px;
+      position: relative;
+      z-index: 1;
+    }
+    .feature-list li {
+      margin-bottom: 15px;
+      position: relative;
+      padding-left: 40px;
+      font-size: 17px;
+      color: #ffffff; /* Pure white for list items */
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Text shadow for better readability */
+    }
+    .feature-list li:before {
+      content: "✅";
+      position: absolute;
+      left: 0;
+      font-size: 20px;
+      animation: bounceIn 0.8s ease-out;
+    }
+
+    @keyframes bounceIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      70% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+
+    .hidden {
+      display: none;
+    }
+    .prediction-info {
+      text-align: left;
+      margin: 30px 0;
+      padding: 25px;
+      background: rgba(30, 30, 30, 0.8); /* Consistent with card background */
+      border-radius: 20px;
+      position: relative;
+      box-shadow: 0 10px 25px rgba(0, 255, 255, 0.2); /* Soft cyan shadow */
+    }
+    .prediction-info h2 {
+      color: #00ffff; /* Cyan color for prediction heading */
+      font-size: 24px;
+      margin-bottom: 15px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+    .prediction-info p {
+      color: #ffffff; /* White text for better readability */
+      margin-bottom: 10px;
+      font-size: 16px;
+      text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+    }
+    .emoji-float {
+      position: absolute;
+      opacity: 0.6; /* Increased opacity for better visibility */
+      animation: float 6s infinite ease-in-out;
+      pointer-events: none;
+      color: #ffd700; /* Gold color for floating emojis */
+      z-index: 0;
+      filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.7)); /* Glow effect */
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-30px) rotate(15deg); /* More pronounced movement */
+    }
+
+    /* New dynamic element: Glowing particles */
+    .particle {
+      position: absolute;
+      background-color: rgba(0, 255, 255, 0.7); /* Cyan glowing particles */
+      border-radius: 50%;
+      animation: particleAnimation 10s infinite ease-in-out;
+      opacity: 0;
+      z-index: -1;
+    }
+
+    @keyframes particleAnimation {
+      0% {
+        transform: translate(var(--x1), var(--y1)) scale(0);
+        opacity: 0;
+      }
+      20% {
+        opacity: 0.8;
+        transform: translate(var(--x2), var(--y2)) scale(1);
+      }
+      80% {
+        opacity: 0.8;
+        transform: translate(var(--x3), var(--y3)) scale(1);
+      }
+      100% {
+        transform: translate(var(--x4), var(--y4)) scale(0);
+        opacity: 0;
+      }
+    }
+
+    /* Scroll Down Arrow Button Styling */
+    .scroll-down-btn {
+      background: none;
+      border: none;
+      color: #fff; /* White color for the arrow and text */
+      font-size: 16px; /* Slightly smaller font for the text */
+      cursor: pointer;
+      margin-bottom: 20px; /* Adjusted margin */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none; /* Remove underline for anchor tag */
+      animation: bounceArrow 1.5s infinite;
+    }
+
+    .scroll-down-btn .arrow-icon {
+      font-size: 2.5rem; /* Slightly smaller arrow icon */
+      margin-bottom: 5px;
+      color: #00ffff; /* Cyan color for the arrow */
+      filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.7)); /* Glow effect */
+    }
+
+    @keyframes bounceArrow {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-10px);
+      }
+      60% {
+        transform: translateY(-5px);
+      }
+    }
+
+    /* Mobile responsiveness */
+    @media screen and (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+      h1 {
+        font-size: 26px;
+      }
+      .card {
+        padding: 25px;
+        margin: 20px 0;
+      }
+      .gift-box {
+        padding: 30px 15px; /* Adjust padding for mobile */
+        max-width: 95%; /* Increase width for mobile */
+      }
+      .gift-box .bonus-text {
+        font-size: 26px; /* Adjust font size for mobile */
+      }
+      .btn {
+        padding: 15px 30px;
+        font-size: 18px;
+      }
+      .feature-list li {
+        font-size: 15px;
+      }
+      .prediction-info {
+        padding: 20px;
+      }
+      .prediction-info h2 {
+        font-size: 20px;
+      }
+      .prediction-info p {
+        font-size: 14px;
+      }
+      .scroll-down-btn {
+        font-size: 14px;
+      }
+      .scroll-down-btn .arrow-icon {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>🎉 6Rwin-এ আজই বোনাস পান! 🎉</h1>
+      
+      <div class="gift-box">
+        <div class="money-emojis">
+          <span>💰</span><span>💸</span><span>💎</span><span>💰</span><span>💸</span>
+          <span>💎</span><span>💰</span><span>💸</span><span>💎</span><span>💰</span>
+        </div>
+        <div class="bonus-text">
+          <a href="http://rich88.6rwin22.com/?referralCode=sxy0404" target="_blank">
+            🔥 প্রথম ডিপোজিটে 80% বোনাস! 🔥
+          </a>
+        </div>
+      </div>
+      
+      <p style="color: #ffffff; font-size: 17px; text-shadow: 1px 1px 1px rgba(0,0,0,0.5);">আমাদের এক্সক্লুসিভ অফার পেতে এখনই জয়েন করুন:</p>
+      
+      <ul class="feature-list">
+        <li>💰 80% ওয়েলকাম বোনাস</li>
+        <li>⚡ তাৎক্ষণিক উইথড্রয়াল</li>
+        <li>📱 24/7 সাপোর্ট</li>
+        <li>🎯 এভিয়েটর সিগন্যাল</li>
+        <li>💎 এক্সক্লুসিভ প্রোমো</li>
+      </ul>
+
+      <a href="#predictionSection" class="scroll-down-btn">
+        <span class="arrow-icon">⬇️</span>
+        এভিয়েটর পূর্বাভাস নিতে নিচের দিকে স্ক্রোল করুন
+      </a>
+      
+      <button class="btn" onclick="window.location.href='http://rich88.6rwin22.com/?referralCode=sxy0404'">
+        🚀 এখনই রেজিস্টার করুন
+      </button>
+      
+      <div class="emoji-float" style="left: 15%; top: 25%; animation-delay: 0s;">✈️</div>
+      <div class="emoji-float" style="right: 20%; top: 35%; animation-delay: 1s;">💵</div>
+      <div class="emoji-float" style="left: 25%; bottom: 10%; animation-delay: 2s;">🎁</div>
+    </div>
+    
+    <div class="card" id="predictionSection"> <h1>🔮 এভিয়েটর পূর্বাভাস পান 🔮</h1>
+      
+      <button class="btn" id="showPrediction">
+        ✈️ এভিয়েটর সিগন্যাল দেখুন
+      </button>
+      
+      <div id="predictionContent" class="hidden">
+        <div class="prediction-info">
+          <h2>🤖 6Rwin AI প্রেডিকশন সিস্টেম</h2>
+          <p>আমাদের অত্যাধুনিক AI টেকনোলজি ব্যবহার করে এভিয়েটর গেমের সঠিক পূর্বাভাস পান। প্রতিদিন হাজারো প্লেয়ার আমাদের সিগন্যাল ব্যবহার করে বড় অংকের জিতছে।</p>
+          
+          <h3>⚙️ কিভাবে কাজ করে?</h3>
+          <p>1. 🤖 AI প্যাটার্ন অ্যানালাইসিস</p>
+          <p>2. ⚡ রিয়েল-টাইম ডাটা</p>
+          <p>3. 🎯 85%+ একুরেসি</p>
+          <p>4. 🔔 ইনস্ট্যান্ট নোটিফিকেশন</p>
+          
+          <button class="btn" onclick="window.location.href='https://6rwin.github.io/6rwin-Aviator-Predator-Ai/'">
+            🎮 এখনই শুরু করুন
+          </button>
+        </div>
+      </div>
+      
+      <div class="emoji-float" style="left: 20%; bottom: 15%; animation-delay: 0.5s;">📈</div>
+      <div class="emoji-float" style="right: 25%; bottom: 25%; animation-delay: 1.5s;">🎲</div>
+      <div class="emoji-float" style="left: 10%; top: 40%; animation-delay: 2.5s;">🏆</div>
+    </div>
+    
+    <div class="emoji-header">💸🎯💎</div>
+  </div>
+
+  <script>
+    document.getElementById('showPrediction').addEventListener('click', function() {
+      document.getElementById('predictionContent').classList.toggle('hidden');
+    });
+
+    // Add glowing particles
+    const body = document.body;
+    for (let i = 0; i < 20; i++) {
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+      const size = Math.random() * 10 + 5; // Size between 5px and 15px
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      particle.style.left = `${Math.random() * 100}%`;
+      particle.style.top = `${Math.random() * 100}%`;
+      
+      // Random animation values for diverse movement
+      particle.style.setProperty('--x1', `${(Math.random() - 0.5) * 200}px`);
+      particle.style.setProperty('--y1', `${(Math.random() - 0.5) * 200}px`);
+      particle.style.setProperty('--x2', `${(Math.random() - 0.5) * 300}px`);
+      particle.style.setProperty('--y2', `${(Math.random() - 0.5) * 300}px`);
+      particle.style.setProperty('--x3', `${(Math.random() - 0.5) * 400}px`);
+      particle.style.setProperty('--y3', `${(Math.random() - 0.5) * 400}px`);
+      particle.style.setProperty('--x4', `${(Math.random() - 0.5) * 500}px`);
+      particle.style.setProperty('--y4', `${(Math.random() - 0.5) * 500}px`);
+      
+      particle.style.animationDelay = `${Math.random() * 10}s`;
+      body.appendChild(particle);
+    }
+
+    // Enhanced floating emojis with more dynamic movement
+    const floatingEmojis = ['💰', '🎁', '💸', '💎', '🎉', '🌟', '✈️', '🏆', '💵', '🤑'];
+    for (let i = 0; i < 50; i++) { // Increased number of floating emojis
+      const emojiDiv = document.createElement('div');
+      emojiDiv.classList.add('emoji-float');
+      emojiDiv.textContent = floatingEmojis[Math.floor(Math.random() * floatingEmojis.length)];
+      emojiDiv.style.left = `${Math.random() * 100}%`;
+      emojiDiv.style.top = `${Math.random() * 100}%`;
+      emojiDiv.style.animationDelay = `${Math.random() * 15}s`;
+      emojiDiv.style.animationDuration = `${8 + Math.random() * 15}s`; // More varied duration
+      emojiDiv.style.fontSize = `${1.5 + Math.random() * 2}rem`; // More size variation
+      
+      // Add random initial rotation and scale
+      emojiDiv.style.transform = `rotate(${Math.random() * 360}deg) scale(${0.7 + Math.random() * 0.6})`;
+      
+      // Add more dynamic animation
+      emojiDiv.style.animationName = `float${Math.floor(Math.random() * 3) + 1}`;
+      body.appendChild(emojiDiv);
+    }
+
+    // Add additional float animations
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes float1 {
+        0%, 100% { transform: translateY(0) rotate(0deg) scale(${0.8 + Math.random() * 0.4}); }
+        50% { transform: translateY(-40px) rotate(${10 + Math.random() * 20}deg) scale(${1 + Math.random() * 0.3}); }
+      }
+      @keyframes float2 {
+        0%, 100% { transform: translate(${Math.random() * 20 - 10}px, 0) rotate(${Math.random() * 20 - 10}deg); }
+        50% { transform: translate(${Math.random() * 40 - 20}px, -30px) rotate(${20 + Math.random() * 40}deg); }
+      }
+      @keyframes float3 {
+        0% { transform: translateY(0) rotate(0deg); }
+        25% { transform: translateY(-20px) rotate(10deg); }
+        50% { transform: translateY(-40px) rotate(20deg); }
+        75% { transform: translateY(-20px) rotate(10deg); }
+        100% { transform: translateY(0) rotate(0deg); }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>
